@@ -33,7 +33,7 @@ function newWorker(){
           var bytes = to_bytes(sum, size);
           var actual = md5(bytes);
 
-          if ( sum % Math.ceil(limit / 10) == 0) {
+          if ( sum % Math.ceil(1 / 100 * limit) == 0) {
             this.fire('progress', {id: size, value: sum});
           }
 
