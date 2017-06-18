@@ -12,18 +12,19 @@
   <div>
     <h1>BruteMD5</h1>
     <h2>Decrypt MD5 Hash</h1>
-    <p><a href="http://passwordsgenerator.net/md5-hash-generator">Click here</a> to generate a md5 hash.</p>
+    <p><a href="http://passwordsgenerator.net/md5-hash-generator" target="_blank">Click here</a> to generate a md5 hash.</p>
   </div>
   <div>
     <label for="hash">Hash:</label>
-    <input type="text" id="hash" size="23" placeholder="cfcd208495d565ef66e7dff9f98764da">
+    <input type="text" id="hash" size="32" placeholder="cfcd208495d565ef66e7dff9f98764da">
     <button id="decrypt" onclick="decrypt()">Decrypt</button>
     <span id="error"></span>
   </div>
   <div>
     <label for="text">Text:</label>
-    <input type="text" id="text" size="23" readonly="">
+    <input type="text" id="text" size="32" readonly="">
     <button id="stop" disabled="" onclick="stop()">Stop</button>
+    <span id="success"></span>
   </div>
   <div>
     <ol id="progress">

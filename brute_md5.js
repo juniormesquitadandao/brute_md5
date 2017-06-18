@@ -73,10 +73,18 @@ function newWorker(){
 
     var stop = document.getElementById('stop');
     stop.disabled = true;
+
+    var hash = document.getElementById('hash');
+    hash.readOnly = false;
+
+    var success = document.getElementById('success');
+    success.innerHTML = 'Success!';
   });
 };
 
 function decrypt(){
+  var success = document.getElementById('success');
+  success.innerHTML = '';
   var hash = document.getElementById('hash');
   var value = hash.value.trim().toLocaleLowerCase();
   var decrypt = document.getElementById('decrypt');
@@ -96,6 +104,7 @@ function decrypt(){
 
   decrypt.disabled = true;
   stop.disabled = false;
+  hash.readOnly = true;
   text.placeholder = '';
   text.value = '';
   progress.remove();
@@ -110,9 +119,11 @@ function stop(){
 
   var decrypt = document.getElementById('decrypt');
   var stop = document.getElementById('stop');
+  var hash = document.getElementById('hash');
 
   decrypt.disabled = false;
   stop.disabled = true;
+  hash.readOnly = false;
 
   worker = newWorker();
 }
