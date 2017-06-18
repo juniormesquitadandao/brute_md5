@@ -1,5 +1,5 @@
 function newWorker(){
-    return cw(function(hash){
+  return cw(function(hash){
     importScripts('https://cdn.rawgit.com/emn178/js-md5/gh-pages/build/md5.min.js');
 
     function to_bytes(sum, size){
@@ -16,7 +16,7 @@ function newWorker(){
       return String.fromCharCode(...bytes);
     }
 
-    function brute_md5(hash){
+    function brute_md5(){
       for(var i = 0; ; i++){
         var size = i + 1;
         var limit = 256 ** size;
@@ -51,7 +51,7 @@ function newWorker(){
       }
     }
 
-    brute_md5.call(this, hash);
+    brute_md5.call(this);
   }).on('size', function(params){
     var progress = document.createElement('progress');
     progress.id = 'progress_' + params.id;
