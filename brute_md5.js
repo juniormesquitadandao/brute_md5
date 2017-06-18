@@ -20,7 +20,12 @@ function newWorker(){
       for(var i = 0; ; i++){
         var size = i + 1;
         var limit = 256 ** size;
-        this.fire('size', {id: size, max: limit});
+
+        var start = new Date().getTime();
+        md5(to_bytes(limit - 1));
+        var end = new Date().getTime();
+
+        this.fire('size', {id: size, max: limit, measure: ((end - start) || 1) * (limit - (256 ** i)) / 450 });
 
         var bytes = to_bytes(0, size);
         var actual = md5(bytes);
@@ -53,8 +58,18 @@ function newWorker(){
     progress.max = params.max;
     progress.value = 0;
 
+    var time = document.createElement('span');
+    var start = new Date();
+    var end = new Date(start.getTime() + params.measure);
+    var estimated = countdown(start, end);
+    if (estimated.toString().length == 0){
+      estimated = '0 milliseconds'
+    }
+    time.innerHTML = 'estimated: ' + estimated;
+
     var li = document.createElement('li');
     li.appendChild(progress);
+    li.appendChild(time);
 
     var ol = document.getElementById('progress');
     ol.appendChild(li);
