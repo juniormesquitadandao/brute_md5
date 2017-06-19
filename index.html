@@ -7,6 +7,7 @@
   <script src="catiline.min.js"></script>
   <script src="countdown.min.js"></script>
   <script src="md5.min.js"></script>
+  <script src="push.min.js"></script>
   <script src="brute_md5.js"></script>
 </head>
 <body>
@@ -14,12 +15,13 @@
     <h1>BruteMD5</h1>
     <h2>Decrypt MD5 Hash</h2>
     <p><a href="http://passwordsgenerator.net/md5-hash-generator" target="_blank">Click here</a> to generate a md5 hash.</p>
+    <p><button onclick="enable()">Click here</button> to enable notification.</p>
   </div>
   <div>
     <form onsubmit="window.decrypt(); return false">
       <label for="hash">Hash:</label>
       <input type="text" name="hash" id="hash" size="32" placeholder="cfcd208495d565ef66e7dff9f98764da" autocomplete="">
-      <button id="decrypt" type="button">Decrypt</button>
+      <button id="decrypt">Decrypt</button>
       <span id="error"></span>
     </form>
   </div>

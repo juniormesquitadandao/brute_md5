@@ -112,6 +112,15 @@ function newWorker(){
 
     var success = document.getElementById('success');
     success.innerHTML = 'Success!';
+
+    Push.create("BruteMD5", {
+      body: 'Decrypted!\nhash: ' + hash.value + '\nText: ' + text,
+      timeout: 7000,
+      onClick: function () {
+          window.focus();
+          this.close();
+      }
+    });
   });
 };
 
@@ -164,3 +173,14 @@ function stop(){
 }
 
 var worker = newWorker();
+
+function enable(){
+  Push.create("BruteMD5", {
+    body: 'Enabled!',
+    timeout: 1000,
+    onClick: function () {
+      window.focus();
+      this.close();
+    }
+  });
+}
