@@ -25,7 +25,7 @@ function newWorker(){
         md5(to_bytes(limit - 1));
         var end = new Date().getTime();
 
-        this.fire('size', {id: size, max: limit, measure: ((end - start) || 1) * (limit - (256 ** i)) / 450 });
+        this.fire('size', size);
 
         var bytes = to_bytes(0, size);
         var actual = md5(bytes);
@@ -39,7 +39,7 @@ function newWorker(){
           var actual = md5(bytes);
 
           if ( sum % Math.ceil(1 / 100 * limit) == 0) {
-            this.fire('progress', {id: size, value: sum});
+            this.fire('progress', {id: size});
           }
 
           if(hash == actual){
@@ -47,25 +47,21 @@ function newWorker(){
             return;
           }
         }
-        this.fire('progress', {id: size, value: sum});
+        this.fire('progress', {id: size, end: true});
       }
     }
 
     brute_md5.call(this);
-  }).on('size', function(params){
+  }).on('size', function(id){
     var progress = document.createElement('progress');
-    progress.id = 'progress_' + params.id;
-    progress.max = params.max;
+    progress.id = 'progress_' + id;
+    progress.max = 100;
     progress.value = 0;
+    progress.start = new Date();
 
     var time = document.createElement('span');
-    var start = new Date();
-    var end = new Date(start.getTime() + params.measure);
-    var estimated = countdown(start, end);
-    if (estimated.toString().length == 0){
-      estimated = '0 milliseconds'
-    }
-    time.innerHTML = 'estimated: ' + estimated;
+    time.id = 'time_' + id;
+    time.innerHTML = ' 0% - calculating...'
 
     var li = document.createElement('li');
     li.appendChild(progress);
@@ -76,9 +72,31 @@ function newWorker(){
 
     var text = document.getElementById('text');
     text.placeholder += '#';
+
+    var characters = document.getElementById('characters');
+    characters.innerHTML = 'must be ' + id + ' or more characters.';
   }).on('progress',function(params){
     var progress = document.getElementById('progress_' + params.id);
-    progress.value = params.value;
+    var time = document.getElementById('time_'+params.id);
+    if (params.end) {
+      progress.value = progress.max;
+      var end = new Date();
+      var total = countdown(progress.start, end);
+      if (total.toString().length == 0){
+        total = '0 milliseconds'
+      }
+      time.innerHTML = ' ' + progress.value + '% - ' + total;
+    } else {
+      progress.value += 1;
+      var measure = new Date().getTime() - progress.start.getTime();
+      var measure = (measure / progress.value) * (progress.max - progress.value);
+      var end = new Date(progress.start.getTime() + measure);
+      var estimated = countdown(progress.start, end);
+      if (estimated.toString().length == 0){
+        estimated = '0 milliseconds'
+      }
+      time.innerHTML = ' ' + progress.value + '% - ' + estimated;
+    }
   }).on('result',function(text){
     var input = document.getElementById('text');
     input.value = text;
@@ -127,6 +145,8 @@ function decrypt(){
   progress.id = 'progress';
   progressDiv.appendChild(progress);
   worker.data(value);
+
+  return false;
 }
 
 function stop(){
