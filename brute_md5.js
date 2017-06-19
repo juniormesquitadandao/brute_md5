@@ -114,7 +114,7 @@ function newWorker(){
     success.innerHTML = 'Success!';
 
     Push.create("BruteMD5", {
-      body: 'Decrypted!\nhash: ' + hash.value + '\nText: ' + text,
+      body: 'Decrypted ' + hash.value + ' to ' + text,
       timeout: 7000,
       onClick: function () {
           window.focus();
@@ -176,7 +176,7 @@ var worker = newWorker();
 
 function enable(){
   Push.create("BruteMD5", {
-    body: 'Enabled!',
+    body: 'Enabled',
     timeout: 1000,
     onClick: function () {
       window.focus();
