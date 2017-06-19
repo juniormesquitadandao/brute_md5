@@ -10,12 +10,16 @@
   <script src="push.min.js"></script>
   <script src="brute_md5.js"></script>
 </head>
-<body>
+<body onload="set_characters();">
   <div>
     <h1>BruteMD5</h1>
     <h2>Decrypt MD5 Hash</h2>
     <p><a href="http://passwordsgenerator.net/md5-hash-generator" target="_blank">Click here</a> to generate a md5 hash.</p>
     <p><button onclick="enable()">Click here</button> to enable notification.</p>
+  </div>
+  <div>
+    <label>Characters Avaliables:</label>
+    <input type="text" id="characters_avaliables" size="100">
   </div>
   <div>
     <form onsubmit="window.decrypt(); return false">

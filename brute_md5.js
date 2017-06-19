@@ -1,57 +1,74 @@
 function newWorker(){
-  return cw(function(hash){
-    importScripts('https://cdn.rawgit.com/emn178/js-md5/gh-pages/build/md5.min.js');
+  return cw(function(params){
+    try {
+      importScripts('https://cdn.rawgit.com/emn178/js-md5/gh-pages/build/md5.min.js');
 
-    function to_bytes(sum, size){
-      var bytes = [];
-      for(var i = 0; i < size; i++){
-        var byte = sum % 256;
-        sum = Math.trunc(sum / 256);
-        bytes[i] = byte;
-      }
-      return bytes;
-    }
+      var hash = params.hash;
+      var avaliables = [];
+      params.characters.forEach(function(character){
+        avaliables[character.charCodeAt()] = true;
+      });
 
-    function to_sting(bytes){
-      return String.fromCharCode(...bytes);
-    }
+      function to_bytes(sum, size){
+        var bytes = [];
+        for(var i = 0; i < size; i++){
+          var byte = sum % 256;
+          sum = Math.trunc(sum / 256);
 
-    function brute_md5(){
-      for(var i = 0; ; i++){
-        var size = i + 1;
-        var limit = 256 ** size;
-
-        var start = new Date().getTime();
-        md5(to_bytes(limit - 1));
-        var end = new Date().getTime();
-
-        this.fire('size', size);
-
-        var bytes = to_bytes(0, size);
-        var actual = md5(bytes);
-        if(hash == actual){
-          this.fire('result', to_sting(bytes));
-          return;
-        }
-
-        for(var sum = 256 ** i; sum < limit; sum++){
-          var bytes = to_bytes(sum, size);
-          var actual = md5(bytes);
-
-          if ( sum % Math.ceil(1 / 100 * limit) == 0) {
-            this.fire('progress', {id: size});
+          if(!avaliables[byte]){
+            return null;
           }
 
-          if(hash == actual){
-            this.fire('result', to_sting(bytes));
-            return;
-          }
+          bytes[i] = byte;
         }
-        this.fire('progress', {id: size, end: true});
+        return bytes;
       }
-    }
 
-    brute_md5.call(this);
+      function to_sting(bytes){
+        return String.fromCharCode(...bytes);
+      }
+
+      function brute_md5(){
+        for(var i = 0; ; i++){
+          var size = i + 1;
+          var limit = 256 ** size;
+          this.fire('size', size);
+
+          for(var sum = 256 ** i; sum < limit; sum++){
+            var bytes = to_bytes(sum, size);
+            if (bytes == null) {
+              if ( sum % Math.ceil(1 / 100 * limit) == 0) {
+                var progress = sum / Math.ceil(1 / 100 * limit);
+                this.fire('progress', {id: size, value: progress});
+              }
+              continue;
+            }
+
+            var actual = md5(bytes);
+            if ( sum % Math.ceil(1 / 100 * limit) == 0) {
+              var progress = sum / Math.ceil(1 / 100 * limit);
+              this.fire('progress', {id: size, value: progress});
+            }
+
+            if(hash == actual){
+              this.fire('result', { text: to_sting(bytes), progress: size });
+              return;
+            }
+          }
+          this.fire('progress', {id: size, end: true});
+        }
+      }
+
+      brute_md5.call(this);
+    } catch (e) {
+      this.fire('error', e);
+      return e;
+    }
+  }).on('error', function(e){
+    stop();
+    var error = document.getElementById('error');
+    error.innerHTML = '*' + e.message;
+    console.log(e);
   }).on('size', function(id){
     var progress = document.createElement('progress');
     progress.id = 'progress_' + id;
@@ -87,7 +104,7 @@ function newWorker(){
       }
       time.innerHTML = ' ' + progress.value + '% - ' + total;
     } else {
-      progress.value += 1;
+      progress.value = params.value;
       var measure = new Date().getTime() - progress.start.getTime();
       var measure = (measure / progress.value) * (progress.max - progress.value);
       var end = new Date(progress.start.getTime() + measure);
@@ -97,9 +114,9 @@ function newWorker(){
       }
       time.innerHTML = ' ' + progress.value + '% - ' + estimated;
     }
-  }).on('result',function(text){
+  }).on('result',function(params){
     var input = document.getElementById('text');
-    input.value = text;
+    input.value = params.text;
 
     var decrypt = document.getElementById('decrypt');
     decrypt.disabled = false;
@@ -114,13 +131,22 @@ function newWorker(){
     success.innerHTML = 'Success!';
 
     Push.create("BruteMD5", {
-      body: 'Decrypted ' + hash.value + ' to ' + text,
+      body: 'Decrypted ' + hash.value + ' to ' + input.value,
       timeout: 7000,
       onClick: function () {
           window.focus();
           this.close();
       }
     });
+
+    var progress = document.getElementById('progress_' + params.progress);
+    var time = document.getElementById('time_'+params.progress);
+    var end = new Date();
+    var total = countdown(progress.start, end);
+    if (total.toString().length == 0){
+      total = '0 milliseconds'
+    }
+    time.innerHTML = ' ' + progress.value + '% - ' + total;
   });
 };
 
@@ -153,7 +179,7 @@ function decrypt(){
   progress = document.createElement('ol');
   progress.id = 'progress';
   progressDiv.appendChild(progress);
-  worker.data(value);
+  worker.data({hash: value, characters: get_characters()});
 
   return false;
 }
@@ -183,4 +209,14 @@ function enable(){
       this.close();
     }
   });
+}
+
+function set_characters(){
+  var characters_avaliables = document.getElementById('characters_avaliables');
+  characters_avaliables.value = " !\"\#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+}
+
+function get_characters(){
+  var characters_avaliables = document.getElementById('characters_avaliables');
+  return characters_avaliables.value.split('');
 }
