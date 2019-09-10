@@ -1,7 +1,7 @@
 function newWorker(){
   return cw(function(params){
     try {
-      importScripts('https://rawcdn.githack.com/juniormesquitadandao/brute_md5/5b0ec4ebcf52504cda16d1a997cbce2c9f55d613/md5.min.js');
+      importScripts('https://raw.githack.com/juniormesquitadandao/brute_md5/master/md5.min.js');
 
       var hash = params.hash;
       var avaliables = [];
